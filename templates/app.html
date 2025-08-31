@@ -1,0 +1,74 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Prédiction — Prediction App</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <div class="container">
+    <header class="topbar">
+      <div>Connecté en tant que <strong>{{ user }}</strong></div>
+      <a class="link" href="/logout">Se déconnecter</a>
+    </header>
+
+    <div class="card">
+      <h1>Prédire un montant à partir d'une date</h1>
+
+      <form id="predict-form" onsubmit="return false;">
+        <label for="date">Date</label>
+        <input id="date" name="date" type="text" placeholder="ex: 23-06-2021" required />
+        <div class="actions">
+          <button id="btn" type="button">Prédire</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="card">
+      <h2>Résultat</h2>
+      <pre id="result" class="amount">—</pre>
+           
+    </div>
+  </div>
+
+  <script>
+    const btn = document.getElementById("btn");
+    const input = document.getElementById("date");
+    const resultPre = document.getElementById("result");
+
+
+
+   
+
+    btn.addEventListener("click", async () => {
+      const date = (input.value || "").trim();
+      if (!date) { resultPre.textContent = "Veuillez saisir une date valide."; return; }
+      resultPre.textContent = "⏳ Calcul en cours...";
+      try {
+        const r = await fetch("/predict", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ date })
+        });
+        const data = await r.json();
+        if (!r.ok) throw new Error(data?.detail || "Erreur");
+        
+        const amount = Number(data?.prediction);
+if (Number.isFinite(amount)) {
+  resultPre.textContent = amount.toLocaleString('fr-FR', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  });
+} else {
+  resultPre.textContent = "Montant indisponible";
+}
+      } catch (e) {
+        resultPre.textContent = "❌ " + (e.message || e);
+        advice.classList.add('hidden');
+      }
+    });
+  </script>
+</body>
+</html>

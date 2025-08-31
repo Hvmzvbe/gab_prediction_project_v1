@@ -1,0 +1,28 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Connexion — Prediction App</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="card narrow">
+      <h1>Connexion</h1>
+      {% if error %}
+        <div class="alert error">{{ error }}</div>
+      {% endif %}
+      <form method="post" action="/login">
+        <label>Nom d'utilisateur</label>
+        <input type="text" name="username" required />
+        <label>Mot de passe</label>
+        <input type="password" name="password" required />
+        <button type="submit">Se connecter</button>
+      </form>
+      <p class="hint">Démo: <code>admin / admin123</code></p>
+    </div>
+  </div>
+</body>
+</html>
