@@ -46,7 +46,7 @@ class DatePredictor:
         out = {}
 
         for current in sorted(req_idx):
-            # Avance récursive si besoin (dates futures vs hist.max)
+            
             if current > hist.index.max():
                 step = hist.index.max() + pd.Timedelta(days=1)
                 while step <= current:

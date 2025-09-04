@@ -12,21 +12,21 @@ from starlette.middleware.sessions import SessionMiddleware
 from pydantic import BaseModel
 from fastapi.templating import Jinja2Templates
 
-# ---- Config ----
+
 APP_NAME = "Prediction App"
 MODEL_PATH = os.getenv("MODEL_PATH", "model.pkl")
 SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-change-me")
 
 app = FastAPI(title=APP_NAME, version="1.0.0", description="UI + API FastAPI (login + prédiction)")
 
-# Static & templates
+
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
-# Sessions (simple cookie session for demo)
+
 app.add_middleware(SessionMiddleware, secret_key=SECRET_KEY)
 
-# CORS ouvert (facilite tests; restreindre en prod)
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -35,10 +35,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Masquer l'avertissement xgboost sur les modèles sérialisés d'ancienne version (facultatif)
+
 warnings.filterwarnings("ignore", message=".*serialized model.*", category=UserWarning, module="xgboost")
 
-# ---- Modèle ----
+
 _model: Optional[Any] = None
 
 def _load_model(path: str = MODEL_PATH):
@@ -57,7 +57,7 @@ def _ensure_model_loaded():
     if _model is None:
         raise HTTPException(status_code=500, detail=f"Modèle non chargé. Placez le fichier '{MODEL_PATH}' ou définissez MODEL_PATH.")
 
-# ---- Schémas ----
+
 class PredictIn(BaseModel):
     date: str
 
@@ -65,8 +65,7 @@ class PredictOut(BaseModel):
     date: str
     prediction: float
 
-# ---- Auth minimale (DEMO) ----
-# Remplacez par une vraie base/utilisateur en prod
+
 USERS = {"admin": "admin123"}
 
 def get_current_user(request: Request) -> Optional[str]:
@@ -78,10 +77,10 @@ def login_required(request: Request):
         raise HTTPException(status_code=401, detail="Non authentifié.")
     return user
 
-# ---- Routes UI ----
+
 @app.get("/", response_class=HTMLResponse)
 def home(request: Request):
-    # Redirige vers /app si loggé, sinon /login
+    
     if get_current_user(request):
         return RedirectResponse(url="/app", status_code=302)
     return RedirectResponse(url="/login", status_code=302)
@@ -104,10 +103,10 @@ def logout(request: Request):
 
 @app.get("/app", response_class=HTMLResponse)
 def app_view(request: Request, user: str = Depends(login_required)):
-    # Page avec le champ date + fetch() vers POST /predict
+    
     return templates.TemplateResponse("app.html", {"request": request, "user": user})
 
-# ---- Endpoints API ----
+
 @app.get("/health")
 def health():
     return {"status": "ok", "model_loaded": _model is not None, "model_path": MODEL_PATH}
@@ -121,7 +120,7 @@ def reload_model():
 def predict(payload: PredictIn):
     _ensure_model_loaded()
     try:
-        y = _model.predict(payload.date)  # ou _model.predict([payload.date]) selon votre objet
+        y = _model.predict(payload.date)  
         if hasattr(y, "__iter__") and not isinstance(y, (str, bytes)):
             y = float(list(y)[0])
         else:
@@ -130,7 +129,7 @@ def predict(payload: PredictIn):
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Erreur de prédiction: {e}")
 
-# GET pratique pour tests (navigateur)
+
 @app.get("/predict", response_model=PredictOut)
 def predict_get(date: str = Query(..., description="Ex: 23-06-2021")):
     return predict(PredictIn(date=date))

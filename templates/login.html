@@ -1,14 +1,394 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Connexion — Prediction App</title>
-  <link rel="stylesheet" href="/static/styles.css" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Animated background particles with Moroccan theme */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 20% 80%, rgba(251, 146, 60, 0.1) 0%, transparent 50%),
+                  radial-gradient(circle at 80% 20%, rgba(100, 116, 139, 0.15) 0%, transparent 50%),
+                  radial-gradient(circle at 40% 40%, rgba(251, 146, 60, 0.08) 0%, transparent 50%);
+      animation: float 20s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-20px) rotate(180deg); }
+    }
+
+    .container {
+      max-width: 400px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 20px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Logo section */
+    .logo-section {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 40px;
+      animation: fadeIn 1s ease-out;
+    }
+
+    .logo {
+      width: 140px;
+      height: 140px;
+      position: relative;
+      animation: logoFloat 3s ease-in-out infinite;
+    }
+
+    .logo-star {
+      width: 70px;
+      height: 70px;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      animation: starPulse 2s ease-in-out infinite;
+    }
+
+    .logo-star svg {
+      width: 100%;
+      height: 100%;
+      fill: #fb923c;
+      filter: drop-shadow(0 3px 6px rgba(251, 146, 60, 0.4));
+    }
+
+    .logo-circle {
+      width: 110px;
+      height: 110px;
+      border: 4px solid #64748b;
+      border-radius: 50%;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      border-top-color: transparent;
+      border-right-color: transparent;
+      animation: circleRotate 4s linear infinite;
+    }
+
+    .logo-waves {
+      position: absolute;
+      bottom: -15px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90px;
+      height: 25px;
+    }
+
+    .logo-waves::before,
+    .logo-waves::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      width: 30px;
+      height: 4px;
+      background: #64748b;
+      border-radius: 4px;
+    }
+
+    .logo-waves::before {
+      left: 0;
+      animation: wave1 2s ease-in-out infinite;
+    }
+
+    .logo-waves::after {
+      right: 0;
+      animation: wave2 2s ease-in-out infinite 0.5s;
+    }
+
+    .logo-text {
+      text-align: center;
+      margin-top: 20px;
+      color: #64748b;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      opacity: 0.8;
+      animation: fadeIn 1.5s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes logoFloat {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-12px); }
+    }
+
+    @keyframes starPulse {
+      0%, 100% { transform: translate(-50%, -50%) scale(1) rotate(0deg); }
+      50% { transform: translate(-50%, -50%) scale(1.08) rotate(1deg); }
+    }
+
+    @keyframes circleRotate {
+      from { transform: translate(-50%, -50%) rotate(0deg); }
+      to { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+
+    @keyframes wave1 {
+      0%, 100% { transform: scaleX(1) translateY(0); }
+      50% { transform: scaleX(1.2) translateY(-3px); }
+    }
+
+    @keyframes wave2 {
+      0%, 100% { transform: scaleX(1) translateY(0); }
+      50% { transform: scaleX(1.3) translateY(-2px); }
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 24px;
+      padding: 40px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      animation: slideUp 0.8s ease-out;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #fb923c, transparent);
+      animation: shimmer 2s infinite;
+    }
+
+    @keyframes shimmer {
+      0% { left: -100%; }
+      100% { left: 100%; }
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(40px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    h1 {
+      color: #1e293b;
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 30px;
+      text-align: center;
+      background: linear-gradient(135deg, #fb923c, #64748b);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .alert {
+      padding: 15px 20px;
+      border-radius: 12px;
+      margin-bottom: 25px;
+      font-size: 14px;
+      font-weight: 500;
+      animation: errorSlide 0.5s ease-out;
+    }
+
+    .alert.error {
+      background: linear-gradient(135deg, #fef2f2, #fee2e2);
+      color: #dc2626;
+      border: 1px solid #fecaca;
+    }
+
+    @keyframes errorSlide {
+      from {
+        opacity: 0;
+        transform: translateX(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    label {
+      color: #4a5568;
+      font-weight: 600;
+      font-size: 16px;
+      margin-bottom: 8px;
+    }
+
+    input {
+      padding: 16px 20px;
+      border: 2px solid #e2e8f0;
+      border-radius: 16px;
+      font-size: 16px;
+      background: rgba(255, 255, 255, 0.8);
+      transition: all 0.3s ease;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: #fb923c;
+      box-shadow: 0 0 0 3px rgba(251, 146, 60, 0.1);
+      transform: translateY(-2px);
+      background: rgba(255, 255, 255, 0.95);
+    }
+
+    button {
+      background: linear-gradient(135deg, #fb923c 0%, #64748b 100%);
+      color: white;
+      border: none;
+      padding: 16px 40px;
+      border-radius: 16px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 8px 25px rgba(251, 146, 60, 0.3);
+      position: relative;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+
+    button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s;
+    }
+
+    button:hover::before {
+      left: 100%;
+    }
+
+    button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 35px rgba(251, 146, 60, 0.4);
+    }
+
+    button:active {
+      transform: translateY(-1px);
+    }
+
+    .hint {
+      text-align: center;
+      margin-top: 25px;
+      color: #64748b;
+      font-size: 14px;
+      padding: 15px;
+      background: rgba(251, 146, 60, 0.05);
+      border-radius: 12px;
+      border: 1px solid rgba(251, 146, 60, 0.1);
+    }
+
+    .hint code {
+      background: rgba(251, 146, 60, 0.1);
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-family: 'Monaco', 'Menlo', monospace;
+      font-size: 13px;
+      color: #fb923c;
+      font-weight: 600;
+    }
+
+    /* Card hover effect */
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Responsive design */
+    @media (max-width: 600px) {
+      .container {
+        padding: 15px;
+      }
+      
+      .card {
+        padding: 30px;
+        border-radius: 20px;
+      }
+      
+      h1 {
+        font-size: 28px;
+      }
+      
+      .logo {
+        width: 120px;
+        height: 120px;
+      }
+      
+      .logo-star {
+        width: 60px;
+        height: 60px;
+      }
+      
+      .logo-circle {
+        width: 95px;
+        height: 95px;
+      }
+    }
+  </style>
 </head>
 <body>
   <div class="container">
+    <div class="logo-section">
+      <div class="logo">
+        <div class="logo-star">
+          <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <path d="M50,5 L58,35 L85,25 L65,45 L95,50 L65,55 L85,75 L58,65 L50,95 L42,65 L15,75 L35,55 L5,50 L35,45 L15,25 L42,35 Z"/>
+          </svg>
+        </div>
+        <div class="logo-circle"></div>
+        <div class="logo-waves"></div>
+      </div>
+      <div class="logo-text">TRÉSORERIE GÉNÉRALE DU ROYAUME</div>
+    </div>
+
     <div class="card narrow">
       <h1>Connexion</h1>
       {% if error %}
@@ -21,7 +401,7 @@
         <input type="password" name="password" required />
         <button type="submit">Se connecter</button>
       </form>
-      <p class="hint">Démo: <code>admin / admin123</code></p>
+      
     </div>
   </div>
 </body>
